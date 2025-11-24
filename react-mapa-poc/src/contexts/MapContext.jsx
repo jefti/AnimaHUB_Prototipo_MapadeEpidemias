@@ -1,15 +1,17 @@
 import React, { createContext, useContext, useState, useEffect } from "react"
-import { listarEventos } from "../services/eventosService"
+import { listarEventos, listarZonas } from "../services/eventosService"
 
 const MapContext = createContext(null)
 
 export function MapProvider({ children }) {
   const [markers, setMarkers] = useState([])
+  const [zones, setZones] = useState([])
   const [selectedDisease, setSelectedDisease] = useState("Todos")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [showZones, setShowZones] = useState(true)
 
-  // Função para buscar os eventos do backend
+  // --- EVENTOS ---
   const fetchMarkers = async () => {
     try {
       setLoading(true)
@@ -20,7 +22,6 @@ export function MapProvider({ children }) {
         .map((e) => {
           const lat = parseFloat(e.lat ?? e.latitude ?? e.latitude_string)
           const lng = parseFloat(e.lng ?? e.longitude ?? e.longitude_string)
-
           if (isNaN(lat) || isNaN(lng)) return null
 
           return {
@@ -45,14 +46,36 @@ export function MapProvider({ children }) {
     }
   }
 
-  // Carrega os eventos na inicialização
+  // --- ZONAS ---
+  const fetchZones = async () => {
+    try {
+      const data = await listarZonas()
+      const validZones = (Array.isArray(data) ? data : []).map((z) => ({
+        id: z.id,
+        lat: parseFloat(z.latitude),
+        lng: parseFloat(z.longitude),
+        raio: parseFloat(z.raio_metros),
+        nome: z.nome,
+        descricao: z.descricao,
+        icone: z.icone,
+        cor: z.cor,
+        data_expiracao: z.data_expiracao
+      }))
+
+      setZones(validZones)
+    } catch (err) {
+      console.error("Erro ao buscar zonas:", err)
+    }
+  }
+
+  // Carrega os eventos e zonas na inicialização
   useEffect(() => {
     let mounted = true
     fetchMarkers()
+    fetchZones()
     return () => { mounted = false }
   }, [])
 
-  // Adiciona um marcador localmente (opcional)
   const addMarker = (marker) => {
     const lat = parseFloat(marker.lat)
     const lng = parseFloat(marker.lng)
@@ -73,11 +96,16 @@ export function MapProvider({ children }) {
     markers,
     setMarkers,
     addMarker,
-    fetchMarkers,  // <-- função que será chamada após criar evento
+    fetchMarkers,
+    zones,      
+    fetchZones,
     selectedDisease,
     setSelectedDisease,
     loading,
     error,
+    showZones,
+    setShowZones,
+    fetchZones,
   }
 
   return <MapContext.Provider value={value}>{children}</MapContext.Provider>
