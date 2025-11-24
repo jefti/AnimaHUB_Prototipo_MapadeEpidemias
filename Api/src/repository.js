@@ -2,6 +2,19 @@ import { query } from './database/db.js'
 
 // --- LOGIN E SESSÕES ---
 
+export async function redefineSenha(localLogin, novaSenha) {
+    try {
+        const [result] = await query(
+            'UPDATE locais SET senha_hash = ? WHERE login = ?;',
+            [novaSenha, localLogin]
+        )
+        return result // contém affectedRows
+    } catch (err) {
+        console.error('Erro em redefineSenha:', err)
+        throw err
+    }
+}
+
 export async function tryLogin(login, pass) {
     return query(
         'SELECT * FROM locais WHERE login = ? AND senha_hash = ?;',
@@ -103,4 +116,30 @@ export async function deleteSessao(token) {
         console.error('Erro em deleteSessao:', err);
         throw err;
     }
+}
+
+// --- Criar zona ---
+export async function criarZona({
+  nome,
+  descricao,
+  icone,
+  cor,
+  data_expiracao,
+  lat,
+  lng,
+  raio_metros,
+  local_id
+}) {
+  const sql = `
+    INSERT INTO zonas
+      (nome, descricao, icone, cor, data_expiracao, latitude, longitude, raio_metros, local_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `
+  return query(sql, [nome, descricao, icone, cor, data_expiracao, lat, lng, raio_metros, local_id])
+}
+
+// --- Listar zonas ---
+export async function getZonas() {
+  const sql = `SELECT * FROM zonas`
+  return query(sql)
 }

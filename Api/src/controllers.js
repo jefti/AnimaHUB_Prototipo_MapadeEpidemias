@@ -24,6 +24,24 @@ export async function login(req, res) {
     }
 }
 
+// --- RECUPERAR SENHA ---
+export async function recoveryPassword(req, res) {
+    try {
+        const { login, nova_senha } = req.body; // espera receber login e nova_senha no corpo da requisição
+
+        if (!login || !nova_senha) {
+            return res.status(400).json({ error: 'Login e nova senha são obrigatórios' });
+        }           
+
+        const result = await eventosRepository.redefineSenha(login, nova_senha);
+     
+        return res.status(200).json({ message: 'Senha redefinida com sucesso' });
+    } catch (err) {
+        console.error('Erro em recoveryPassword:', err);
+        return res.status(500).json({ error: 'Erro ao redefinir senha' });
+    }
+}
+
 // --- VALIDAR TOKEN ---
 export async function validarToken(req, res, next) {
     try {
@@ -130,5 +148,55 @@ export async function getDiseases(req, res) {
   } catch (err) {
       console.error('Erro na recuperação de doenças:', err);
       return res.status(500).json({ error: 'Erro ao recuperar doenças' });
+  }
+}
+
+// --- Criar zona ---
+export async function criarZonaController(req, res) {
+  try {
+    const {
+      nome,
+      descricao,
+      icone,
+      cor,
+      data_expiracao,
+      lat,
+      lng,
+      raio_metros
+    } = req.body
+
+    const local_id = req.local_id // vem do middleware de token
+
+    if (!nome || !lat || !lng || !raio_metros || !cor) {
+      return res.status(400).json({ error: 'Campos obrigatórios faltando' })
+    }
+
+    await eventosRepository.criarZona({
+      nome,
+      descricao,
+      icone,
+      cor,
+      data_expiracao,
+      lat,
+      lng,
+      raio_metros,
+      local_id
+    })
+
+    return res.status(201).json({ message: 'Zona criada com sucesso' })
+  } catch (err) {
+    console.error('Erro ao criar zona:', err)
+    return res.status(500).json({ error: 'Erro ao criar zona' })
+  }
+}
+
+// --- Listar zonas ---
+export async function listarZonasController(req, res) {
+  try {
+    const [zonas] = await eventosRepository.getZonas()
+    return res.status(200).json(zonas)
+  } catch (err) {
+    console.error('Erro ao listar zonas:', err)
+    return res.status(500).json({ error: 'Erro ao recuperar zonas' })
   }
 }

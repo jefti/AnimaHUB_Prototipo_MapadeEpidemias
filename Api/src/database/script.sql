@@ -39,6 +39,22 @@ CREATE TABLE sessoes (
     FOREIGN KEY (local_id) REFERENCES locais(id) ON DELETE CASCADE
 );
 
+CREATE TABLE zonas (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    descricao TEXT,
+    local_id INT UNSIGNED NOT NULL,
+    latitude DECIMAL(9,6) NOT NULL,
+    longitude DECIMAL(9,6) NOT NULL,
+    raio_metros INT NOT NULL,
+    cor VARCHAR(7) DEFAULT '#FF0000', -- padrão vermelho
+    icone VARCHAR(50),                -- nome do ícone opcional
+    data_criacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    data_expiracao DATETIME,
+
+    FOREIGN KEY (local_id) REFERENCES locais(id) ON DELETE CASCADE
+);
+
 INSERT INTO locais (nome, login, senha_hash, descricao)
 VALUES
 ('Posto de Saúde teste', 'teste', 'teste');
