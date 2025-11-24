@@ -1,0 +1,38 @@
+# ===============================
+# Node.js / API
+# ===============================
+/Api/node_modules
+/Api/dist
+/Api/build
+/Api/.env
+/Api/npm-debug.log*
+/Api/yarn-debug.log*
+/Api/yarn-error.log*
+
+# ===============================
+# React / Front-end
+# ===============================
+/react-mapa-poc/node_modules
+/react-mapa-poc/build
+/react-mapa-poc/.env
+/react-mapa-poc/npm-debug.log*
+/react-mapa-poc/yarn-debug.log*
+/react-mapa-poc/yarn-error.log*
+
+# ===============================
+# Sistema
+# ===============================
+.DS_Store
+Thumbs.db
+*.log
+
+# ===============================
+# IDEs e editores
+# ===============================
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
